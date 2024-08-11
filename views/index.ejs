@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lisper</title>
+  <link rel="stylesheet" type="text/css" href="styles/main.css">
+</head>
+
+<body class="body" id="body">
+  <div class="joke-container" id="jokeContainer">
+    <p id="jokeText"><%= setup %></p>
+  </div>
+  <audio id="drumSound" src="/drum.wav"></audio>
+
+  <script>
+    let currentState = 'setup';
+    let setupText = "<%= setup %>";
+    let punchlineText = "<%= punchline %>";
+    let colorIndex = 0;
+
+    const colorCombinations = [
+  { background: '#FF5733', text: '#282828' }, // orange background, dark gray text
+  { background: '#282828', text: '#FF5733' }, // dark gray background, orange text
+  { background: '#3498DB', text: '#FDFEFE' }, // blue background, white text
+  { background: '#1ABC9C', text: '#2C3E50' }, // teal background, dark blue text
+  { background: '#2C3E50', text: '#1ABC9C' }, // dark blue background, teal text
+  { background: '#E74C3C', text: '#ECF0F1' }, // red background, light gray text
+  { background: '#F39C12', text: '#FFFFFF' }, // yellow background, white text
+  { background: '#9B59B6', text: '#FDFEFE' },  // purple background, white text
+  { background: '#2ECC71', text: '#1C2833' },  // green background, dark blue-gray text
+  { background: '#8E44AD', text: '#FDFEFE' },  // dark purple background, white text
+  { background: '#34495E', text: '#ECF0F1' },  // navy background, light gray text
+  { background: '#D35400', text: '#FDFEFE' },  // dark orange background, white text
+  { background: '#C0392B', text: '#FDFEFE' },  // dark red background, white text
+  { background: '#16A085', text: '#FDFEFE' },  // greenish teal background, white text
+  { background: '#2980B9', text: '#FDFEFE' },  // bright blue background, white text
+  { background: '#BDC3C7', text: '#2C3E50' },  // light gray background, dark blue text
+  { background: '#27AE60', text: '#FDFEFE' },  // green background, white text
+  { background: '#F7DC6F', text: '#2C3E50' }   // light yellow background, dark blue text
+];
+
+
+    function updateColors() {
+      const colors = colorCombinations[colorIndex];
+      document.body.style.backgroundColor = colors.background;
+      document.getElementById("jokeText").style.color = colors.text;
+      
+      // Update the colorIndex to move to the next combination
+      colorIndex = (colorIndex + 1) % colorCombinations.length;
+    }
+
+    async function handleInteraction() {
+      if (currentState === 'setup') {
+        // Replace setup with punchline
+        document.getElementById("jokeText").textContent = punchlineText;
+        // Play drum sound
+        document.getElementById("drumSound").play();
+        // Change state to punchline
+        currentState = 'punchline';
+      } else {
+        // Fetch a new joke when in punchline state
+        const response = await fetch('/get-joke');
+        const jokeData = await response.json();
+        setupText = jokeData.setup;
+        punchlineText = jokeData.punchline;
+
+        document.getElementById("jokeText").textContent = setupText;
+        currentState = 'setup';
+        
+        // Update the colors with each new joke
+        updateColors();
+      }
+    }
+
+    function handleKeydown(event) {
+      const ignoredKeys = ["Control", "Alt", "Meta",];
+
+      if (!ignoredKeys.includes(event.key)) {
+        handleInteraction();
+      }
+    }
+
+    // Event listeners for both mouse clicks and key presses
+    document.getElementById("body").addEventListener("click", handleInteraction);
+    document.addEventListener("keydown", handleKeydown);
+
+    // Initial color setup
+    updateColors();
+  </script>
+</body>
+</html>

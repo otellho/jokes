@@ -1,0 +1,19 @@
+.body {
+    background-color: #1FAB89;
+    color: #D7FBE8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    cursor: pointer; /* Makes the entire screen clickable */
+}
+
+.joke-container {
+    text-align: center;
+}
+
+#jokeText {
+    font-size: 2rem; /* Medium-large text */
+}
